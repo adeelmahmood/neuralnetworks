@@ -1,24 +1,30 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 num_features = 100
 num_samples = 50
 iterations = 1000
 learning_rate = 0.009
-verbose = False
+verbose = True
 
 np.random.seed(39)
 
 training_set = np.random.randn(num_features, num_samples)
-test_set = np.random.randn(num_features, int((num_samples*10)/100))
+test_set = np.random.randn(num_features, math.ceil((num_samples*10)/100))
 training_labels = np.random.choice(2, num_samples)
-test_labels = np.random.choice(2, int((num_samples*10)/100))
+test_labels = np.random.choice(2, math.ceil((num_samples*10)/100))
 
 if verbose:
   print('training set')
   print(training_set)
-  print('labels')
-  print(labels)
+  print('training labels')
+  print(training_labels)
+  print('--')
+  print('test set')
+  print(test_set)
+  print('test labels')
+  print(test_labels) 
 
 def sigmoid(z):
   s = 1 / (1 + np.exp(-z))
