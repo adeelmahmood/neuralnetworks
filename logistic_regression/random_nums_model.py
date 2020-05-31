@@ -6,7 +6,7 @@ num_features = 100
 num_samples = 50
 iterations = 1000
 learning_rate = 0.009
-verbose = True
+verbose = False
 
 np.random.seed(39)
 
