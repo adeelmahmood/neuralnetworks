@@ -4,17 +4,28 @@ import math
 
 num_features = 100
 num_samples = 50
-iterations = 1000
+iterations = 10000
 learning_rate = 0.009
 verbose = True
 
-np.random.seed(39)
+# np.random.seed(39)
 
-training_set = np.random.randn(num_features, num_samples)
-training_labels = np.random.choice(2, num_samples).reshape(1, num_samples)
+def compute_labels(set):
+    sums = np.sum(set, axis=0)
+    labels = list(map(lambda x: int(x*100)%2, sums))
+    return np.array(labels).reshape(1, set.shape[1])
 
-test_set = np.random.randn(num_features, math.ceil((num_samples*10)/100))
-test_labels = np.random.choice(2, math.ceil((num_samples*10)/100)).reshape(1, math.ceil((num_samples*10)/100))
+set = np.random.randn(num_features, num_samples)
+labels = compute_labels(set)
+
+test_size = math.ceil((num_samples*10)/100)
+
+# splice the sample dataset to extract training and test sets
+training_set = set[:,:-test_size]
+training_labels = labels[:,:-test_size]
+
+test_set = set[:,-test_size:]
+test_labels = labels[:,-test_size:]
 
 if verbose:
   print('training set shape ' + str(training_set.shape))
@@ -109,6 +120,11 @@ def model(training_set, training_labels, test_set, test_labels, iterations, lear
 
 # run the model
 d = model(training_set, training_labels, test_set, test_labels, iterations, learning_rate, verbose)
+
+print("test labels")
+print(np.squeeze(test_labels))
+print("predicted labels")
+print(np.squeeze(d["predictions_test"]))
 
 costs = np.squeeze(d['costs'])
 plt.plot(costs)
