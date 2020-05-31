@@ -6,25 +6,21 @@ num_features = 100
 num_samples = 50
 iterations = 1000
 learning_rate = 0.009
-verbose = False
+verbose = True
 
 np.random.seed(39)
 
 training_set = np.random.randn(num_features, num_samples)
+training_labels = np.random.choice(2, num_samples).reshape(1, num_samples)
+
 test_set = np.random.randn(num_features, math.ceil((num_samples*10)/100))
-training_labels = np.random.choice(2, num_samples)
-test_labels = np.random.choice(2, math.ceil((num_samples*10)/100))
+test_labels = np.random.choice(2, math.ceil((num_samples*10)/100)).reshape(1, math.ceil((num_samples*10)/100))
 
 if verbose:
-  print('training set')
-  print(training_set)
-  print('training labels')
-  print(training_labels)
-  print('--')
-  print('test set')
-  print(test_set)
-  print('test labels')
-  print(test_labels) 
+  print('training set shape ' + str(training_set.shape))
+  print('training labels shape ' + str(training_labels.shape))
+  print('test set shape ' + str(test_set.shape))
+  print('test labels shape ' + str(test_labels.shape))
 
 def sigmoid(z):
   s = 1 / (1 + np.exp(-z))
@@ -37,7 +33,7 @@ def initialize_weights_and_biases(dim):
 
 def forward(w, b, X, Y):
   m = X.shape[1]
-  
+
   # compute activation matrix
   A = sigmoid(np.matmul(w.T, X) + b)
 
@@ -62,12 +58,12 @@ def optimize(w, b, X, Y, iterations, learning_rate, verbose = False):
     dw = grads["dw"]
     db = grads["db"]
 
-    w = w - learning_rate * dw;
-    b = b - learning_rate * db;
+    w = w - learning_rate * dw
+    b = b - learning_rate * db
 
     if i % 100 == 0:
-      print("cost after iteration " + str(i) + ": " + str(cost))
       costs.append(cost)
+      print("cost after iteration " + str(i) + ": " + str(cost))
 
   params = {"w": w, "b": b}
   grads = {"dw": dw, "db": db}
@@ -84,24 +80,24 @@ def predict(w, b, X):
     if(A[0,i] < 0.5):
       predictions[0,i] = 0
     else:
-      predictions[0,i] = 1 
+      predictions[0,i] = 1
 
   return predictions
 
 def model(training_set, training_labels, test_set, test_labels, iterations, learning_rate, verbose = False):
   w, b = initialize_weights_and_biases(training_set.shape[0])
   if verbose:
-    print('weight = ' + str(w) + ', bias = ' + str(b))
+    print('weight = ' + str(w[0:5,0]) + ', bias = ' + str(b))
 
   # run the forward and backward propagation to figure out the best weights
   params, grads, costs = optimize(w, b, training_set, training_labels, iterations, learning_rate, verbose)
-  if verbose: 
-   print('after optimization, weights and biases')
-   print(params)
-   print(grads)
 
   w = params["w"]
   b = params["b"]
+
+  if verbose:
+   print('after optimization, weights and biases')
+   print('weight = ' + str(w[0:5,0]) + ', bias = ' + str(b))
 
   predictions_train = predict(w, b, training_set)
   predictions_test = predict(w, b, test_set)
@@ -111,7 +107,7 @@ def model(training_set, training_labels, test_set, test_labels, iterations, lear
 
   return {"costs": costs, "predictions_train": predictions_train, "predictions_test": predictions_test}
 
-# run the model  
+# run the model
 d = model(training_set, training_labels, test_set, test_labels, iterations, learning_rate, verbose)
 
 costs = np.squeeze(d['costs'])
@@ -119,5 +115,5 @@ plt.plot(costs)
 plt.ylabel('cost')
 plt.xlabel('iterations (per hundreds)')
 plt.title("Learning rate =" + str(learning_rate))
-plt.show()
+# plt.show()
 
