@@ -2,13 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-num_features = 100
-num_samples = 50
+num_features = 50
+num_samples = 100
 iterations = 10000
 learning_rate = 0.009
 verbose = True
 
-# np.random.seed(39)
+np.random.seed(5)
 
 def compute_labels(set):
     sums = np.sum(set, axis=0)
@@ -121,8 +121,12 @@ def model(training_set, training_labels, test_set, test_labels, iterations, lear
 # run the model
 d = model(training_set, training_labels, test_set, test_labels, iterations, learning_rate, verbose)
 
+print("training set")
+# print(training_labels)
+print(np.unique(training_labels, return_counts=True))
 print("test labels")
 print(np.squeeze(test_labels))
+print(np.unique(test_labels, return_counts=True))
 print("predicted labels")
 print(np.squeeze(d["predictions_test"]))
 
@@ -131,5 +135,5 @@ plt.plot(costs)
 plt.ylabel('cost')
 plt.xlabel('iterations (per hundreds)')
 plt.title("Learning rate =" + str(learning_rate))
-# plt.show()
+plt.show()
 

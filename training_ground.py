@@ -34,9 +34,14 @@ def compute_labels(set):
     labels = list(map(lambda x: int(x*100)%2, sums))
     return np.array(labels).reshape(1, set.shape[1])
 
-data = np.random.randn(5, 5)
-print(data)
-print(compute_labels(data))
+arr = np.random.rand(5, 5)
+print(arr)
+print("sum")
+print(np.sum(arr, axis=0))
+print("* 100")
+print(np.sum(arr, axis=0) * 100)
+print("even or odd")
+print(compute_labels(arr))
 
 
 # train = arr
