@@ -44,6 +44,12 @@ print("even or odd")
 print(compute_labels(arr))
 
 
+a = np.power(np.random.randn(1, 4), 2)
+print(a)
+b = np.sin(a)
+b = b > 0.5
+print(b)
+
 # train = arr
 # labels = np.square(np.sum(train, axis=0))
 # print(train)
