@@ -1,8 +1,8 @@
 import numpy as np
 import math
-from data_utils import random_data_set
+from data_utils import *
 
-# np.random.seed(5)
+np.random.seed(15)
 
 def sigmoid(z):
   s = 1 / (1 + np.exp(-z))
@@ -101,6 +101,11 @@ n_hidden = 4
 n_iterations = 10000
 verbose = True
 
-training_set, training_labels, test_set, test_labels = random_data_set(n_features, n_samples, verbose)
+
+set = np.random.randn(n_features, n_samples)
+labels = compute_labels(set).reshape(1, set.shape[1])
+
+training_set, training_labels, test_set, test_labels = split_train_test_dataset(set, labels, split_by="cols", perc=0.1)
+
 parameters = model(training_set, training_labels, n_hidden, n_iterations)
 predictions = predict(parameters, test_set, test_labels)
