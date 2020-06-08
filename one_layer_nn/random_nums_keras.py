@@ -5,7 +5,9 @@ from keras.models import Sequential
 from keras.optimizers import RMSprop, Adadelta, Adam
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
-from data_utils import *
+import sys
+sys.path.append(".")
+from utils.data_utils import *
 
 np.random.seed(9)
 

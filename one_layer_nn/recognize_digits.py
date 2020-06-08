@@ -1,13 +1,14 @@
 import numpy as np
 import math
-from data_utils import random_data_set
-from data_utils import digits_data_set
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
+import sys
+sys.path.append(".")
+from utils.data_utils import *
 
-# np.random.seed(5)
+# np.random.seed(4)
 
 def sigmoid(z):
   s = 1 / (1 + np.exp(-z))

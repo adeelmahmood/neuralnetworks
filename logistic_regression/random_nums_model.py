@@ -1,8 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import sys
+sys.path.append(".")
+from utils.data_utils import *
 
-num_features = 50
+num_features = 8
 num_samples = 100
 iterations = 10000
 learning_rate = 0.009
@@ -10,28 +13,11 @@ verbose = True
 
 np.random.seed(5)
 
-def compute_labels(set):
-    sums = np.sum(set, axis=0)
-    labels = list(map(lambda x: int(x*100)%2, sums))
-    return np.array(labels).reshape(1, set.shape[1])
-
 set = np.random.randn(num_features, num_samples)
-labels = compute_labels(set)
-
-test_size = math.ceil((num_samples*10)/100)
+labels = compute_labels(set).reshape(1, set.shape[1])
 
 # splice the sample dataset to extract training and test sets
-training_set = set[:,:-test_size]
-training_labels = labels[:,:-test_size]
-
-test_set = set[:,-test_size:]
-test_labels = labels[:,-test_size:]
-
-if verbose:
-  print('training set shape ' + str(training_set.shape))
-  print('training labels shape ' + str(training_labels.shape))
-  print('test set shape ' + str(test_set.shape))
-  print('test labels shape ' + str(test_labels.shape))
+training_set, training_labels, test_set, test_labels = split_train_test_dataset(set, labels, split_by="cols", verbose=verbose)
 
 def sigmoid(z):
   s = 1 / (1 + np.exp(-z))
@@ -72,7 +58,7 @@ def optimize(w, b, X, Y, iterations, learning_rate, verbose = False):
     w = w - learning_rate * dw
     b = b - learning_rate * db
 
-    if i % 100 == 0:
+    if i % 1000 == 0:
       costs.append(cost)
       print("cost after iteration " + str(i) + ": " + str(cost))
 
@@ -97,18 +83,12 @@ def predict(w, b, X):
 
 def model(training_set, training_labels, test_set, test_labels, iterations, learning_rate, verbose = False):
   w, b = initialize_weights_and_biases(training_set.shape[0])
-  if verbose:
-    print('weight = ' + str(w[0:5,0]) + ', bias = ' + str(b))
 
   # run the forward and backward propagation to figure out the best weights
   params, grads, costs = optimize(w, b, training_set, training_labels, iterations, learning_rate, verbose)
 
   w = params["w"]
   b = params["b"]
-
-  if verbose:
-   print('after optimization, weights and biases')
-   print('weight = ' + str(w[0:5,0]) + ', bias = ' + str(b))
 
   predictions_train = predict(w, b, training_set)
   predictions_test = predict(w, b, test_set)
@@ -120,15 +100,6 @@ def model(training_set, training_labels, test_set, test_labels, iterations, lear
 
 # run the model
 d = model(training_set, training_labels, test_set, test_labels, iterations, learning_rate, verbose)
-
-print("training set")
-# print(training_labels)
-print(np.unique(training_labels, return_counts=True))
-print("test labels")
-print(np.squeeze(test_labels))
-print(np.unique(test_labels, return_counts=True))
-print("predicted labels")
-print(np.squeeze(d["predictions_test"]))
 
 costs = np.squeeze(d['costs'])
 plt.plot(costs)

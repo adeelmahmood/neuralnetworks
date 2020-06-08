@@ -1,6 +1,8 @@
 import numpy as np
 import math
-from data_utils import *
+import sys
+sys.path.append(".")
+from utils.data_utils import *
 
 np.random.seed(15)
 

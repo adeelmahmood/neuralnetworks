@@ -49,9 +49,3 @@ print(a)
 b = np.sin(a)
 b = b > 0.5
 print(b)
-
-# train = arr
-# labels = np.square(np.sum(train, axis=0))
-# print(train)
-# print(labels)
-# print(output(train))
