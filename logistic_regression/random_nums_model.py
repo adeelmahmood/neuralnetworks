@@ -6,12 +6,12 @@ sys.path.append(".")
 from utils.data_utils import *
 
 num_features = 8
-num_samples = 100
+num_samples = 1000
 iterations = 10000
 learning_rate = 0.009
 verbose = True
 
-np.random.seed(5)
+np.random.seed(0)
 
 set = np.random.randn(num_features, num_samples)
 labels = compute_labels(set).reshape(1, set.shape[1])

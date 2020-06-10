@@ -35,6 +35,11 @@ def forward(X, parameters):
     W2 = parameters["W2"]
     b2 = parameters["b2"]
 
+#     (1617, 64)
+#     (64, 128)
+#     (1617, 128)
+#     (1, 128)
+
     Z1 = np.matmul(X, W1) + b1
     A1 = sigmoid(Z1)
     Z2 = np.matmul(A1, W2) + b2
@@ -95,8 +100,8 @@ def predict(X, parameters):
     return predictions
 
 def model(X, Y, hidden_layers, iterations):
-    n_input = X.shape[0]
-    n_output = Y.shape[0]
+#     n_input = X.shape[0]
+#     n_output = Y.shape[0]
     parameters = initialize_parameters(X, hidden_layers, Y)
 
     for i in range(iterations):

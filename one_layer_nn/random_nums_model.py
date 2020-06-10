@@ -3,17 +3,14 @@ import math
 import sys
 sys.path.append(".")
 from utils.data_utils import *
+from utils.activation_functions import *
 
 np.random.seed(15)
 
-def sigmoid(z):
-  s = 1 / (1 + np.exp(-z))
-  return s
-
 def initialize_parameters(n_input, n_hidden, n_output):
-    W1 = np.random.randn(n_hidden, n_input) * 0.01
+    W1 = np.random.randn(n_hidden, n_input) * np.sqrt(2 / n_input)
     b1 = np.zeros((n_hidden, 1))
-    W2 = np.random.randn(n_output, n_hidden) * 0.01
+    W2 = np.random.randn(n_output, n_hidden) * np.sqrt(2 / n_hidden)
     b2 = np.zeros((n_output, 1))
 
     return {"W1": W1, "b1": b1, "W2": W2, "b2": b2}
@@ -25,7 +22,7 @@ def forward(X, parameters):
     b2 = parameters["b2"]
 
     Z1 = np.matmul(W1, X) + b1
-    A1 = np.tanh(Z1)
+    A1 = relu(Z1)
     Z2 = np.matmul(W2, A1) + b2
     A2 = sigmoid(Z2)
 
@@ -47,7 +44,8 @@ def backward(X, Y, parameters, activations):
     dZ2 = A2 - Y
     dW2 = (1/m) * np.matmul(dZ2, A1.T)
     db2 = (1/m) * np.sum(dZ2, axis = 1, keepdims = True)
-    dZ1 = np.matmul(W2.T, dZ2) * (1 - np.power(A1, 2))
+
+    dZ1 = np.matmul(W2.T, dZ2) * relu_derv(A1)
     dW1 = (1/m) * np.matmul(dZ1, X.T)
     db1 = (1/m) * np.sum(dZ1, axis = 1, keepdims = True)
 
@@ -97,7 +95,7 @@ def predict(parameters, X, Y):
 #     print(predictions)
     return predictions
 
-n_features = 2
+n_features = 6
 n_samples = 100
 n_hidden = 4
 n_iterations = 10000
@@ -111,3 +109,5 @@ training_set, training_labels, test_set, test_labels = split_train_test_dataset(
 
 parameters = model(training_set, training_labels, n_hidden, n_iterations)
 predictions = predict(parameters, test_set, test_labels)
+print(test_labels)
+print(predictions)
