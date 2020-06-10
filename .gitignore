@@ -221,7 +221,6 @@ config.py
 *.html
 
 # Static files
-*.csv
 service/python/resources/facts_copy/*.json
 service/python/resources/filtered_credit_account_with_ci_and_cs_json_2/*.json
 *.feather
