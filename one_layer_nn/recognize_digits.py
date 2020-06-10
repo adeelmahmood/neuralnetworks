@@ -8,7 +8,7 @@ import sys
 sys.path.append(".")
 from utils.data_utils import *
 
-# np.random.seed(4)
+np.random.seed(0)
 
 def sigmoid(z):
   s = 1 / (1 + np.exp(-z))

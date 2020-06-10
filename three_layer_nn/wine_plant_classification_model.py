@@ -16,9 +16,6 @@ labels = df[['Cultivar 1', 'Cultivar 2', 'Cultivar 3']].values
 
 training_set = df.drop(['Cultivar 1', 'Cultivar 2', 'Cultivar 3'], axis = 1)
 
-# print(training_set.shape)
-# print(labels.shape)
-
 training_set = training_set.values
 
 x_train, x_val, y_train, y_val = train_test_split(training_set, labels, test_size=0.1, random_state=20)
@@ -32,7 +29,7 @@ def initialize_weights_and_biases(n_input, n_hidden, n_output):
     W2 = 2 * np.random.randn(n_hidden, n_hidden) - 1
     b2 = np.zeros((1, n_hidden))
 
-    W3 = 2 * np.random.randn(n_hidden, n_output) - 1
+    W3 = 2 * np.random.rand(n_hidden, n_output) - 1
     b3 = np.zeros((1, n_output))
 
     return {'W1': W1, 'b1': b1, 'W2': W2, 'b2': b2, 'W3': W3, 'b3': b3}
@@ -121,6 +118,8 @@ def train(X, Y, n_hidden, learning_rate, n_iterations):
 
     parameters = initialize_weights_and_biases(n_input, n_hidden, n_output)
 
+    errors = []
+
     for i in range(n_iterations):
         activations = forward(parameters, X)
         grads = backprop(X, Y, parameters, activations)
@@ -131,8 +130,11 @@ def train(X, Y, n_hidden, learning_rate, n_iterations):
             pred = predict(parameters, X)
             y_true = Y.argmax(axis=1)
             print("accuracy after {} iterations {}%".format(i, accuracy_score(y_pred=pred, y_true=y_true)*100))
+            errors.append(accuracy_score(y_pred=pred, y_true=y_true)*100)
 
-    return parameters
+    return parameters, errors
 
-parameters = train(training_set, labels, n_hidden=5, learning_rate = 0.07, n_iterations=4500)
+parameters, errors = train(training_set, labels, n_hidden=5, learning_rate = 0.07, n_iterations=4500)
+# plt.plot(errors)
+# plt.show()
 

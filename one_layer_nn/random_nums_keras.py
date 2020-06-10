@@ -9,7 +9,7 @@ import sys
 sys.path.append(".")
 from utils.data_utils import *
 
-np.random.seed(9)
+np.random.seed(0)
 
 set = np.random.randn(100, 8)
 labels = compute_labels(set, 1)

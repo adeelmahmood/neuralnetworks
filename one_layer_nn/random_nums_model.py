@@ -5,12 +5,12 @@ sys.path.append(".")
 from utils.data_utils import *
 from utils.activation_functions import *
 
-np.random.seed(15)
+np.random.seed(0)
 
 def initialize_parameters(n_input, n_hidden, n_output):
     W1 = np.random.randn(n_hidden, n_input) * np.sqrt(2 / n_input)
     b1 = np.zeros((n_hidden, 1))
-    W2 = np.random.randn(n_output, n_hidden) * np.sqrt(2 / n_hidden)
+    W2 = np.random.rand(n_output, n_hidden) * np.sqrt(2 / n_hidden)
     b2 = np.zeros((n_output, 1))
 
     return {"W1": W1, "b1": b1, "W2": W2, "b2": b2}
