@@ -102,7 +102,7 @@ def update_parameters(parameters, grads, learning_rate):
     return {'W1': W1, 'b1': b1, 'W2': W2, 'b2': b2, 'W3': W3, 'b3': b3}
 
 def cost(A3, Y):
-    m = Y.shape[1]
+    m = Y.shape[0]
     logprobs = (1/m)*np.sum(np.multiply(np.log(A3),Y) + np.multiply(np.log(1-A3),(1-Y)))
     cost = - np.sum(logprobs)
     return cost
