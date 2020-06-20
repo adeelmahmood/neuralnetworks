@@ -49,3 +49,16 @@ print(a)
 b = np.sin(a)
 b = b > 0.5
 print(b)
+
+# ---
+
+x = np.arange(100).reshape(10, 10)
+y = np.arange(10).reshape(1, 10)
+print(x)
+# print(y)
+p = list(np.random.permutation(10))
+print(p)
+
+print(x[p, :])
+# print(y[p, :])
+
