@@ -134,7 +134,13 @@ def train(X, Y, n_hidden, learning_rate, n_iterations):
 
     return parameters, errors
 
-parameters, errors = train(training_set, labels, n_hidden=5, learning_rate = 0.07, n_iterations=4500)
+parameters, errors = train(x_train, y_train, n_hidden=5, learning_rate = 0.07, n_iterations=5000)
+p = predict(parameters, x_val)
+l = np.argmax(y_val, axis=1)
+print(p)
+print(l)
+print("modal accuracy with given set: {} %".format(100 - np.mean(np.abs(p - l)) * 100))
+
 # plt.plot(errors)
 # plt.show()
 
