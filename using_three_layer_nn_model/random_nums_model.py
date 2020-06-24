@@ -35,19 +35,19 @@ for opt in ["gd", "momentum", "adam"]:
         learning_rate = learning_rate, n_iterations=n_iterations,
         activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
         optimizer=opt)
-    nn.predict(parameters, test_set, test_labels, activation_functions)
+    nn.predict(parameters, test_set, test_labels, activation_functions, lambda x: (x > 0.5).astype(int))
 
     print(':: gradient descent with regularization')
     parameters, errors = nn.train(training_set, training_labels, n_hidden=n_hidden,
         learning_rate = learning_rate, n_iterations=n_iterations,
         activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
         optimizer=opt, lambd=0.1)
-    nn.predict(parameters, test_set, test_labels, activation_functions)
+    nn.predict(parameters, test_set, test_labels, activation_functions, lambda x: (x > 0.5).astype(int))
 
     print(':: gradient descent with drop out')
     parameters, errors = nn.train(training_set, training_labels, n_hidden=n_hidden,
         learning_rate = learning_rate, n_iterations=n_iterations,
         activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
         optimizer=opt, keep_prob=0.8)
-    nn.predict(parameters, test_set, test_labels, activation_functions)
+    nn.predict(parameters, test_set, test_labels, activation_functions, lambda x: (x > 0.5).astype(int))
 

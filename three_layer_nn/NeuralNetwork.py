@@ -236,17 +236,19 @@ class NeuralNetwork:
         L2_regularization_cost = (1/m) * (lambd / 2) * (np.sum(np.square(parameters['W1'])) + np.sum(np.square(parameters['W2'])) + np.sum(np.square(parameters['W3'])))
         return cost + L2_regularization_cost
 
-    def predict(self, parameters, X, Y, activation_functions):
+    def predict(self, parameters, X, Y, activation_functions, predic_func):
         activations = self.forward(parameters, X, activation_functions)
         A3 = activations["A3"]
-        predictions = (A3 > 0.5).astype(int)
+#         predictions = (A3 > 0.5).astype(int)
+        predictions = predic_func(A3)
         print("modal accuracy with given set: {} %".format(100 - np.mean(np.abs(predictions - Y)) * 100))
         return predictions
 
-    def predict_s(self, parameters, X, activation_functions):
+    def predict_s(self, parameters, X, activation_functions, predic_func):
         activations = self.forward(parameters, X, activation_functions)
         A3 = activations["A3"]
-        predictions = (A3 > 0.5).astype(int)
+#         predictions = (A3 > 0.5).astype(int)
+        predictions = predic_func(A3)
         return predictions
 
     def train(self,
