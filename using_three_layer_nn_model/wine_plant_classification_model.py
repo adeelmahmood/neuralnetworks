@@ -33,28 +33,29 @@ opt = "gd"
 
 l = np.argmax(y_val, axis=1)
 
-for opt in ["gd", "momentum", "adam"]:
-    print('\n:: gradient descent - optimizer = ' + opt)
-    parameters, errors = nn.train(x_train, y_train, n_hidden=n_hidden,
-            learning_rate = learning_rate, n_iterations=n_iterations,
-            activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
-            optimizer=opt, printCost=False)
-    p = nn.predict_s(parameters, x_val, activation_functions, lambda x: np.argmax(x, axis=1))
-    print("modal accuracy with given set: {} %".format(100 - np.mean(np.abs(p - l)) * 100))
+for train in [nn.train, nn.train_in_batches]:
+    for opt in ["gd", "momentum", "adam"]:
+        print('\n:: gradient descent - optimizer = ' + opt + ' - train = ' + str(train.__name__))
+        parameters, errors = train(x_train, y_train, n_hidden=n_hidden,
+                learning_rate = learning_rate, n_iterations=n_iterations,
+                activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
+                optimizer=opt, printCost=False)
+        p = nn.predict_s(parameters, x_val, activation_functions, lambda x: np.argmax(x, axis=1))
+        print("modal accuracy with given set: {} %".format(100 - np.mean(np.abs(p - l)) * 100))
 
-    print(':: gradient descent with regularization')
-    parameters, errors = nn.train(x_train, y_train, n_hidden=n_hidden,
-            learning_rate = learning_rate, n_iterations=n_iterations,
-            activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
-            optimizer=opt, printCost=False, lambd=0.1)
-    p = nn.predict_s(parameters, x_val, activation_functions, lambda x: np.argmax(x, axis=1))
-    print("modal accuracy with given set: {} %".format(100 - np.mean(np.abs(p - l)) * 100))
+        print(':: gradient descent with regularization')
+        parameters, errors = nn.train(x_train, y_train, n_hidden=n_hidden,
+                learning_rate = learning_rate, n_iterations=n_iterations,
+                activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
+                optimizer=opt, printCost=False, lambd=0.1)
+        p = nn.predict_s(parameters, x_val, activation_functions, lambda x: np.argmax(x, axis=1))
+        print("modal accuracy with given set: {} %".format(100 - np.mean(np.abs(p - l)) * 100))
 
-    print(':: gradient descent with drop out')
-    parameters, errors = nn.train(x_train, y_train, n_hidden=n_hidden,
-            learning_rate = learning_rate, n_iterations=n_iterations,
-            activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
-            optimizer=opt, printCost=False, keep_prob=0.8)
-    p = nn.predict_s(parameters, x_val, activation_functions, lambda x: np.argmax(x, axis=1))
-    print("modal accuracy with given set: {} %".format(100 - np.mean(np.abs(p - l)) * 100))
+        print(':: gradient descent with drop out')
+        parameters, errors = nn.train(x_train, y_train, n_hidden=n_hidden,
+                learning_rate = learning_rate, n_iterations=n_iterations,
+                activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
+                optimizer=opt, printCost=False, keep_prob=0.8)
+        p = nn.predict_s(parameters, x_val, activation_functions, lambda x: np.argmax(x, axis=1))
+        print("modal accuracy with given set: {} %".format(100 - np.mean(np.abs(p - l)) * 100))
 

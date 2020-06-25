@@ -12,15 +12,15 @@ class NeuralNetwork:
     def __init__(self, seed):
         self.seed = seed
 
-    def generate_mini_batches(self, X, Y, batch_size=64):
+    def generate_mini_batches(self, X, Y, batch_size=64, seed=0):
         batches = []
         m = X.shape[0]
 
-        np.random.seed(self.seed)
+        np.random.seed(seed)
 
         permutation = list(np.random.permutation(m))
         shuffleX = X[permutation, :]
-        shuffleY = Y[permutation, :].reshape(m, 1)
+        shuffleY = Y[permutation, :].reshape(m, Y.shape[1])
 
         num_batches = math.floor(m/batch_size)
         for i in range(0, num_batches):
@@ -255,7 +255,7 @@ class NeuralNetwork:
         X, Y, n_hidden, learning_rate, n_iterations,
         activation_functions, activation_functions_dervs,
         keep_prob=1, lambd=0, optimizer="gd",
-        batch_size=64, beta=0.9, beta1=0.9, beta2=0.999, epsilon=1e-8,
+        beta=0.9, beta1=0.9, beta2=0.999, epsilon=1e-8,
         printCost=False):
 
         n_input = X.shape[1]
@@ -296,5 +296,60 @@ class NeuralNetwork:
                     print("cost after {} iterations {}".format(i, str(self.cost(activations['A3'], Y))))
                 elif(lambd != 0):
                     print("cost after {} iterations {}".format(i, str(self.cost_with_regularization(activations['A3'], Y, parameters, lambd))))
+
+        return parameters, errors
+
+    def train_in_batches(self,
+        X, Y, n_hidden, learning_rate, n_iterations,
+        activation_functions, activation_functions_dervs,
+        keep_prob=1, lambd=0, optimizer="gd",
+        batch_size=64, beta=0.9, beta1=0.9, beta2=0.999, epsilon=1e-8,
+        printCost=False):
+
+        n_input = X.shape[1]
+        n_output = Y.shape[1]
+        t = 0
+
+        parameters = self.initialize_weights_and_biases([n_input, n_hidden, n_hidden, n_output])
+
+        if (optimizer == "momentum"):
+            v = self.initialize_momentum(parameters)
+        elif (optimizer == "adam"):
+            v, s = self.initialize_adam(parameters)
+
+        batchSeed = 0
+
+        errors = []
+        for i in range(n_iterations):
+            for batch in self.generate_mini_batches(X, Y, batch_size, batchSeed):
+
+                (batchX, batchY) = batch
+                batchSeed = batchSeed + 1
+
+                if(keep_prob == 1):
+                    activations = self.forward(parameters, batchX, activation_functions)
+                elif(keep_prob != 0):
+                    activations = self.forward_with_dropout(parameters, batchX, activation_functions, keep_prob)
+
+                if(lambd == 0 and keep_prob == 1):
+                    grads = self.backprop(batchX, batchY, parameters, activations, activation_functions_dervs)
+                elif(lambd != 0):
+                    grads = self.backprop_with_regularization(batchX, batchY, parameters, activations, activation_functions_dervs, lambd)
+                elif(keep_prob < 1):
+                    grads = self.backprop_with_dropout(batchX, batchY, parameters, activations, activation_functions_dervs, keep_prob)
+
+                if (optimizer == "gd"):
+                    parameters = self.update_parameters(parameters, grads, learning_rate)
+                elif (optimizer == "momentum"):
+                    parameters, v = self.update_parameters_with_momentum(parameters, grads, learning_rate, v, beta)
+                elif (optimizer == "adam"):
+                    t = t + 1
+                    parameters, v, s = self.update_parameters_with_adam(parameters, grads, v, s, t, learning_rate, beta1, beta2, epsilon)
+
+                if(printCost == True and i % 1000 == 0):
+                    if(lambd == 0):
+                        print("cost after {} iterations {}".format(i, str(self.cost(activations['A3'], batchY))))
+                    elif(lambd != 0):
+                        print("cost after {} iterations {}".format(i, str(self.cost_with_regularization(activations['A3'], batchY, parameters, lambd))))
 
         return parameters, errors
