@@ -23,16 +23,19 @@ print('tail')
 print(arr[-2:])
 
 print('left')
-print(arr[:,:-2])
+print(arr[:, :-2])
 
 print('right')
-print(arr[:,-2:])
+print(arr[:, -2:])
 
 print('+++')
+
+
 def compute_labels(set):
     sums = np.sum(set, axis=0)
-    labels = list(map(lambda x: int(x*100)%2, sums))
+    labels = list(map(lambda x: int(x * 100) % 2, sums))
     return np.array(labels).reshape(1, set.shape[1])
+
 
 arr = np.random.rand(5, 5)
 print(arr)
@@ -42,7 +45,6 @@ print("* 100")
 print(np.sum(arr, axis=0) * 100)
 print("even or odd")
 print(compute_labels(arr))
-
 
 a = np.power(np.random.randn(1, 4), 2)
 print(a)
@@ -61,4 +63,3 @@ print(p)
 
 print(x[p, :])
 # print(y[p, :])
-

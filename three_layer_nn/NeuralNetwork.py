@@ -1,65 +1,39 @@
-import numpy as np
 import sys
+
 sys.path.append(".")
-from utils.data_utils import *
 from utils.activation_functions import *
-import matplotlib
-import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
+from utils.data_utils import *
+
 
 class NeuralNetwork:
     def __init__(self, seed):
         self.seed = seed
 
-    def generate_mini_batches(self, X, Y, batch_size=64, seed=0):
-        batches = []
-        m = X.shape[0]
-
-        np.random.seed(seed)
-
-        permutation = list(np.random.permutation(m))
-        shuffleX = X[permutation, :]
-        shuffleY = Y[permutation, :].reshape(m, Y.shape[1])
-
-        num_batches = math.floor(m/batch_size)
-        for i in range(0, num_batches):
-            batchX = shuffleX[i*batch_size : (i+1)*batch_size, :]
-            batchY = shuffleY[i*batch_size : (i+1)*batch_size, :]
-            batch = (batchX, batchY)
-            batches.append(batch)
-
-        if (m % batch_size != 0):
-            batchX = shuffleX[num_batches*batch_size : , :]
-            batchY = shuffleY[num_batches*batch_size : , :]
-            batch = (batchX, batchY)
-            batches.append(batch)
-
-        return batches
-
     def initialize_weights_and_biases(self, layers_dim, seed=0):
         parameters = {}
         np.random.seed(self.seed)
-        for i in range(len(layers_dim)-1):
-            parameters["W" + str(i+1)] = 2 * (np.random.randn(layers_dim[i], layers_dim[i+1]) if (i<len(layers_dim)-2) else np.random.rand(layers_dim[i], layers_dim[i+1])) - 1
-            parameters["b" + str(i+1)] = np.zeros((1, layers_dim[i+1]))
+        for i in range(len(layers_dim) - 1):
+            parameters["W" + str(i + 1)] = 2 * (
+                np.random.randn(layers_dim[i], layers_dim[i + 1]) if (i < len(layers_dim) - 2) else np.random.rand(
+                    layers_dim[i], layers_dim[i + 1])) - 1
+            parameters["b" + str(i + 1)] = np.zeros((1, layers_dim[i + 1]))
         return parameters
 
     def initialize_momentum(self, parameters):
         v = {}
-        for i in range(len(parameters)//2):
-            v["dW" + str(i+1)] = np.zeros_like(parameters["W" + str(i+1)])
-            v["db" + str(i+1)] = np.zeros_like(parameters["b" + str(i+1)])
+        for i in range(len(parameters) // 2):
+            v["dW" + str(i + 1)] = np.zeros_like(parameters["W" + str(i + 1)])
+            v["db" + str(i + 1)] = np.zeros_like(parameters["b" + str(i + 1)])
         return v
 
     def initialize_adam(self, parameters):
         v = {}
         s = {}
-        for i in range(len(parameters)//2):
-            v["dW" + str(i+1)] = np.zeros_like(parameters["W" + str(i+1)])
-            v["db" + str(i+1)] = np.zeros_like(parameters["b" + str(i+1)])
-            s["dW" + str(i+1)] = np.zeros_like(parameters["W" + str(i+1)])
-            s["db" + str(i+1)] = np.zeros_like(parameters["b" + str(i+1)])
+        for i in range(len(parameters) // 2):
+            v["dW" + str(i + 1)] = np.zeros_like(parameters["W" + str(i + 1)])
+            v["db" + str(i + 1)] = np.zeros_like(parameters["b" + str(i + 1)])
+            s["dW" + str(i + 1)] = np.zeros_like(parameters["W" + str(i + 1)])
+            s["db" + str(i + 1)] = np.zeros_like(parameters["b" + str(i + 1)])
         return v, s
 
     def forward(self, parameters, X, activation_functions):
@@ -119,16 +93,16 @@ class NeuralNetwork:
         A1 = activations['A1']
 
         dZ3 = A3 - Y
-        dW3 = (1/m) * np.matmul(A2.T, dZ3)
-        db3 = (1/m) * np.sum(dZ3, axis=0)
+        dW3 = (1 / m) * np.matmul(A2.T, dZ3)
+        db3 = (1 / m) * np.sum(dZ3, axis=0)
 
         dZ2 = np.matmul(dZ3, W3.T) * activation_functions_dervs[0](A2)
-        dW2 = (1/m) * np.matmul(A1.T, dZ2)
-        db2 = (1/m) * np.sum(dZ2, axis=0)
+        dW2 = (1 / m) * np.matmul(A1.T, dZ2)
+        db2 = (1 / m) * np.sum(dZ2, axis=0)
 
         dZ1 = np.matmul(dZ2, W2.T) * activation_functions_dervs[1](A1)
-        dW1 = (1/m) * np.matmul(X.T, dZ1)
-        db1 = (1/m) * np.sum(dZ1, axis=0)
+        dW1 = (1 / m) * np.matmul(X.T, dZ1)
+        db1 = (1 / m) * np.sum(dZ1, axis=0)
 
         return {'dW1': dW1, 'db1': db1, 'dW2': dW2, 'db2': db2, 'dW3': dW3, 'db3': db3}
 
@@ -142,16 +116,16 @@ class NeuralNetwork:
         A1 = activations['A1']
 
         dZ3 = A3 - Y
-        dW3 = (1/m) * np.matmul(A2.T, dZ3) + (lambd * W3)/m
-        db3 = (1/m) * np.sum(dZ3, axis=0)
+        dW3 = (1 / m) * np.matmul(A2.T, dZ3) + (lambd * W3) / m
+        db3 = (1 / m) * np.sum(dZ3, axis=0)
 
         dZ2 = np.matmul(dZ3, W3.T) * activation_functions_dervs[0](A2)
-        dW2 = (1/m) * np.matmul(A1.T, dZ2) + (lambd * W2)/m
-        db2 = (1/m) * np.sum(dZ2, axis=0)
+        dW2 = (1 / m) * np.matmul(A1.T, dZ2) + (lambd * W2) / m
+        db2 = (1 / m) * np.sum(dZ2, axis=0)
 
         dZ1 = np.matmul(dZ2, W2.T) * activation_functions_dervs[1](A1)
-        dW1 = (1/m) * np.matmul(X.T, dZ1) + (lambd * W1)/m
-        db1 = (1/m) * np.sum(dZ1, axis=0)
+        dW1 = (1 / m) * np.matmul(X.T, dZ1) + (lambd * W1) / m
+        db1 = (1 / m) * np.sum(dZ1, axis=0)
 
         return {'dW1': dW1, 'db1': db1, 'dW2': dW2, 'db2': db2, 'dW3': dW3, 'db3': db3}
 
@@ -166,80 +140,84 @@ class NeuralNetwork:
         D2 = activations['D2']
 
         dZ3 = A3 - Y
-        dW3 = (1/m) * np.matmul(A2.T, dZ3)
-        db3 = (1/m) * np.sum(dZ3, axis=0)
+        dW3 = (1 / m) * np.matmul(A2.T, dZ3)
+        db3 = (1 / m) * np.sum(dZ3, axis=0)
 
         dA2 = np.matmul(dZ3, W3.T)
         dA2 = dA2 * D2
         dA2 = dA2 / keep_prob
 
         dZ2 = dA2 * activation_functions_dervs[0](A2)
-        dW2 = (1/m) * np.matmul(A1.T, dZ2)
-        db2 = (1/m) * np.sum(dZ2, axis=0)
+        dW2 = (1 / m) * np.matmul(A1.T, dZ2)
+        db2 = (1 / m) * np.sum(dZ2, axis=0)
 
         dA1 = np.matmul(dZ2, W2.T)
         dA1 = dA1 * D1
         dA1 = dA1 / keep_prob
 
         dZ1 = dA1 * activation_functions_dervs[1](A1)
-        dW1 = (1/m) * np.matmul(X.T, dZ1)
-        db1 = (1/m) * np.sum(dZ1, axis=0)
+        dW1 = (1 / m) * np.matmul(X.T, dZ1)
+        db1 = (1 / m) * np.sum(dZ1, axis=0)
 
         return {'dW1': dW1, 'db1': db1, 'dW2': dW2, 'db2': db2, 'dW3': dW3, 'db3': db3}
 
-
     def update_parameters(self, parameters, grads, learning_rate):
-        for i in range(len(parameters)//2):
-            parameters["W" + str(i+1)] = parameters["W" + str(i+1)] - grads["dW" + str(i+1)] * learning_rate
-            parameters["b" + str(i+1)] = parameters["b" + str(i+1)] - grads["db" + str(i+1)] * learning_rate
+        for i in range(len(parameters) // 2):
+            parameters["W" + str(i + 1)] = parameters["W" + str(i + 1)] - grads["dW" + str(i + 1)] * learning_rate
+            parameters["b" + str(i + 1)] = parameters["b" + str(i + 1)] - grads["db" + str(i + 1)] * learning_rate
         return parameters
 
     def update_parameters_with_momentum(self, parameters, grads, learning_rate, v, beta):
-        for i in range(len(parameters)//2):
-            v["dW" + str(i+1)] = beta * v["dW" + str(i+1)] + (1 - beta) * grads["dW" + str(i+1)]
-            v["db" + str(i+1)] = beta * v["db" + str(i+1)] + (1 - beta) * grads["db" + str(i+1)]
+        for i in range(len(parameters) // 2):
+            v["dW" + str(i + 1)] = beta * v["dW" + str(i + 1)] + (1 - beta) * grads["dW" + str(i + 1)]
+            v["db" + str(i + 1)] = beta * v["db" + str(i + 1)] + (1 - beta) * grads["db" + str(i + 1)]
 
-            parameters["W" + str(i+1)] = parameters["W" + str(i+1)] - v["dW" + str(i+1)] * learning_rate
-            parameters["b" + str(i+1)] = parameters["b" + str(i+1)] - v["db" + str(i+1)] * learning_rate
+            parameters["W" + str(i + 1)] = parameters["W" + str(i + 1)] - v["dW" + str(i + 1)] * learning_rate
+            parameters["b" + str(i + 1)] = parameters["b" + str(i + 1)] - v["db" + str(i + 1)] * learning_rate
         return parameters, v
 
-    def update_parameters_with_adam(self, parameters, grads, v, s, t, learning_rate=0.1, beta1=0.9, beta2=0.999, epsilon=1e-8):
+    def update_parameters_with_adam(self, parameters, grads, v, s, t, learning_rate=0.1, beta1=0.9, beta2=0.999,
+                                    epsilon=1e-8):
         v_c = {}
         s_c = {}
-        for i in range(len(parameters)//2):
-            v["dW" + str(i+1)] = beta1 * v["dW" + str(i+1)] + (1 - beta1) * grads["dW" + str(i+1)]
-            v["db" + str(i+1)] = beta1 * v["db" + str(i+1)] + (1 - beta1) * grads["db" + str(i+1)]
+        for i in range(len(parameters) // 2):
+            v["dW" + str(i + 1)] = beta1 * v["dW" + str(i + 1)] + (1 - beta1) * grads["dW" + str(i + 1)]
+            v["db" + str(i + 1)] = beta1 * v["db" + str(i + 1)] + (1 - beta1) * grads["db" + str(i + 1)]
 
-            v_c["dW" + str(i+1)] = v["dW" + str(i+1)] / (1 - beta1**t)
-            v_c["db" + str(i+1)] = v["db" + str(i+1)] / (1 - beta1**t)
+            v_c["dW" + str(i + 1)] = v["dW" + str(i + 1)] / (1 - beta1 ** t)
+            v_c["db" + str(i + 1)] = v["db" + str(i + 1)] / (1 - beta1 ** t)
 
-            s["dW" + str(i+1)] = beta2 * s["dW" + str(i+1)] + (1 - beta2) * grads["dW" + str(i+1)]**2
-            s["db" + str(i+1)] = beta2 * s["db" + str(i+1)] + (1 - beta2) * grads["db" + str(i+1)]**2
+            s["dW" + str(i + 1)] = beta2 * s["dW" + str(i + 1)] + (1 - beta2) * grads["dW" + str(i + 1)] ** 2
+            s["db" + str(i + 1)] = beta2 * s["db" + str(i + 1)] + (1 - beta2) * grads["db" + str(i + 1)] ** 2
 
-            s_c["dW" + str(i+1)] = s["dW" + str(i+1)] / (1 - beta2**t)
-            s_c["db" + str(i+1)] = s["db" + str(i+1)] / (1 - beta2**t)
+            s_c["dW" + str(i + 1)] = s["dW" + str(i + 1)] / (1 - beta2 ** t)
+            s_c["db" + str(i + 1)] = s["db" + str(i + 1)] / (1 - beta2 ** t)
 
-            parameters["W" + str(i+1)] = parameters["W" + str(i+1)] - learning_rate * (v_c["dW" + str(i+1)] / (np.sqrt(s_c["dW" + str(i+1)]) + epsilon))
-            parameters["b" + str(i+1)] = parameters["b" + str(i+1)] - learning_rate * (v_c["db" + str(i+1)] / (np.sqrt(s_c["db" + str(i+1)]) + epsilon))
+            parameters["W" + str(i + 1)] = parameters["W" + str(i + 1)] - learning_rate * (
+                    v_c["dW" + str(i + 1)] / (np.sqrt(s_c["dW" + str(i + 1)]) + epsilon))
+            parameters["b" + str(i + 1)] = parameters["b" + str(i + 1)] - learning_rate * (
+                    v_c["db" + str(i + 1)] / (np.sqrt(s_c["db" + str(i + 1)]) + epsilon))
         return parameters, v, s
 
     def cost(self, A, Y):
         m = Y.shape[0]
-        logprobs = (1/m)*np.sum(np.multiply(np.log(A),Y) + np.multiply(np.log(1-A),(1-Y)))
+        logprobs = (1 / m) * np.sum(np.multiply(np.log(A), Y) + np.multiply(np.log(1 - A), (1 - Y)))
         cost = - np.sum(logprobs)
         return cost
 
     def cost_with_regularization(self, A, Y, parameters, lambd):
         m = Y.shape[0]
-        logprobs = (1/m)*np.sum(np.multiply(np.log(A),Y) + np.multiply(np.log(1-A),(1-Y)))
+        logprobs = (1 / m) * np.sum(np.multiply(np.log(A), Y) + np.multiply(np.log(1 - A), (1 - Y)))
         cost = - np.sum(logprobs)
-        L2_regularization_cost = (1/m) * (lambd / 2) * (np.sum(np.square(parameters['W1'])) + np.sum(np.square(parameters['W2'])) + np.sum(np.square(parameters['W3'])))
+        L2_regularization_cost = (1 / m) * (lambd / 2) * (
+                np.sum(np.square(parameters['W1'])) + np.sum(np.square(parameters['W2'])) + np.sum(
+            np.square(parameters['W3'])))
         return cost + L2_regularization_cost
 
     def predict(self, parameters, X, Y, activation_functions, predic_func):
         activations = self.forward(parameters, X, activation_functions)
         A3 = activations["A3"]
-#         predictions = (A3 > 0.5).astype(int)
+        #         predictions = (A3 > 0.5).astype(int)
         predictions = predic_func(A3)
         print("modal accuracy with given set: {} %".format(100 - np.mean(np.abs(predictions - Y)) * 100))
         return predictions
@@ -247,16 +225,16 @@ class NeuralNetwork:
     def predict_s(self, parameters, X, activation_functions, predic_func):
         activations = self.forward(parameters, X, activation_functions)
         A3 = activations["A3"]
-#         predictions = (A3 > 0.5).astype(int)
+        #         predictions = (A3 > 0.5).astype(int)
         predictions = predic_func(A3)
         return predictions
 
     def train(self,
-        X, Y, n_hidden, learning_rate, n_iterations,
-        activation_functions, activation_functions_dervs,
-        keep_prob=1, lambd=0, optimizer="gd",
-        beta=0.9, beta1=0.9, beta2=0.999, epsilon=1e-8,
-        printCost=False):
+              X, Y, n_hidden, learning_rate, n_iterations,
+              activation_functions, activation_functions_dervs,
+              keep_prob=1, lambd=0, optimizer="gd",
+              beta=0.9, beta1=0.9, beta2=0.999, epsilon=1e-8,
+              printCost=False):
 
         n_input = X.shape[1]
         n_output = Y.shape[1]
@@ -271,16 +249,17 @@ class NeuralNetwork:
 
         errors = []
         for i in range(n_iterations):
-            if(keep_prob == 1):
+            if (keep_prob == 1):
                 activations = self.forward(parameters, X, activation_functions)
-            elif(keep_prob != 0):
+            elif (keep_prob != 0):
                 activations = self.forward_with_dropout(parameters, X, activation_functions, keep_prob)
 
-            if(lambd == 0 and keep_prob == 1):
+            if (lambd == 0 and keep_prob == 1):
                 grads = self.backprop(X, Y, parameters, activations, activation_functions_dervs)
-            elif(lambd != 0):
-                grads = self.backprop_with_regularization(X, Y, parameters, activations, activation_functions_dervs, lambd)
-            elif(keep_prob < 1):
+            elif (lambd != 0):
+                grads = self.backprop_with_regularization(X, Y, parameters, activations, activation_functions_dervs,
+                                                          lambd)
+            elif (keep_prob < 1):
                 grads = self.backprop_with_dropout(X, Y, parameters, activations, activation_functions_dervs, keep_prob)
 
             if (optimizer == "gd"):
@@ -289,22 +268,24 @@ class NeuralNetwork:
                 parameters, v = self.update_parameters_with_momentum(parameters, grads, learning_rate, v, beta)
             elif (optimizer == "adam"):
                 t = t + 1
-                parameters, v, s = self.update_parameters_with_adam(parameters, grads, v, s, t, learning_rate, beta1, beta2, epsilon)
+                parameters, v, s = self.update_parameters_with_adam(parameters, grads, v, s, t, learning_rate, beta1,
+                                                                    beta2, epsilon)
 
-            if(printCost == True and i % 1000 == 0):
-                if(lambd == 0):
+            if (printCost == True and i % 1000 == 0):
+                if (lambd == 0):
                     print("cost after {} iterations {}".format(i, str(self.cost(activations['A3'], Y))))
-                elif(lambd != 0):
-                    print("cost after {} iterations {}".format(i, str(self.cost_with_regularization(activations['A3'], Y, parameters, lambd))))
+                elif (lambd != 0):
+                    print("cost after {} iterations {}".format(i, str(
+                        self.cost_with_regularization(activations['A3'], Y, parameters, lambd))))
 
         return parameters, errors
 
     def train_in_batches(self,
-        X, Y, n_hidden, learning_rate, n_iterations,
-        activation_functions, activation_functions_dervs,
-        keep_prob=1, lambd=0, optimizer="gd",
-        batch_size=64, beta=0.9, beta1=0.9, beta2=0.999, epsilon=1e-8,
-        printCost=False):
+                         X, Y, n_hidden, learning_rate, n_iterations,
+                         activation_functions, activation_functions_dervs,
+                         keep_prob=1, lambd=0, optimizer="gd",
+                         batch_size=64, beta=0.9, beta1=0.9, beta2=0.999, epsilon=1e-8,
+                         printCost=False):
 
         n_input = X.shape[1]
         n_output = Y.shape[1]
@@ -321,22 +302,24 @@ class NeuralNetwork:
 
         errors = []
         for i in range(n_iterations):
-            for batch in self.generate_mini_batches(X, Y, batch_size, batchSeed):
+            for batch in generate_mini_batches(X, Y, batch_size, batchSeed):
 
                 (batchX, batchY) = batch
                 batchSeed = batchSeed + 1
 
-                if(keep_prob == 1):
+                if (keep_prob == 1):
                     activations = self.forward(parameters, batchX, activation_functions)
-                elif(keep_prob != 0):
+                elif (keep_prob != 0):
                     activations = self.forward_with_dropout(parameters, batchX, activation_functions, keep_prob)
 
-                if(lambd == 0 and keep_prob == 1):
+                if (lambd == 0 and keep_prob == 1):
                     grads = self.backprop(batchX, batchY, parameters, activations, activation_functions_dervs)
-                elif(lambd != 0):
-                    grads = self.backprop_with_regularization(batchX, batchY, parameters, activations, activation_functions_dervs, lambd)
-                elif(keep_prob < 1):
-                    grads = self.backprop_with_dropout(batchX, batchY, parameters, activations, activation_functions_dervs, keep_prob)
+                elif (lambd != 0):
+                    grads = self.backprop_with_regularization(batchX, batchY, parameters, activations,
+                                                              activation_functions_dervs, lambd)
+                elif (keep_prob < 1):
+                    grads = self.backprop_with_dropout(batchX, batchY, parameters, activations,
+                                                       activation_functions_dervs, keep_prob)
 
                 if (optimizer == "gd"):
                     parameters = self.update_parameters(parameters, grads, learning_rate)
@@ -344,12 +327,14 @@ class NeuralNetwork:
                     parameters, v = self.update_parameters_with_momentum(parameters, grads, learning_rate, v, beta)
                 elif (optimizer == "adam"):
                     t = t + 1
-                    parameters, v, s = self.update_parameters_with_adam(parameters, grads, v, s, t, learning_rate, beta1, beta2, epsilon)
+                    parameters, v, s = self.update_parameters_with_adam(parameters, grads, v, s, t, learning_rate,
+                                                                        beta1, beta2, epsilon)
 
-                if(printCost == True and i % 1000 == 0):
-                    if(lambd == 0):
+                if (printCost == True and i % 1000 == 0):
+                    if (lambd == 0):
                         print("cost after {} iterations {}".format(i, str(self.cost(activations['A3'], batchY))))
-                    elif(lambd != 0):
-                        print("cost after {} iterations {}".format(i, str(self.cost_with_regularization(activations['A3'], batchY, parameters, lambd))))
+                    elif (lambd != 0):
+                        print("cost after {} iterations {}".format(i, str(
+                            self.cost_with_regularization(activations['A3'], batchY, parameters, lambd))))
 
         return parameters, errors

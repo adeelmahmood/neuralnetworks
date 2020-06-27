@@ -1,5 +1,5 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 x1 = np.linspace(-10.0, 10.0, 100)
 x2 = np.linspace(-10.0, 10.0, 100)

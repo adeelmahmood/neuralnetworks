@@ -1,16 +1,17 @@
+import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 from keras.layers import Dense
 from keras.models import Sequential
-from keras.optimizers import RMSprop, Adadelta, Adam
+from keras.optimizers import Adadelta
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
-import matplotlib .pyplot as plt
+
 
 def print_img(digits, indx):
     plt.gray()
     plt.matshow(dig.images[indx])
     plt.show()
+
 
 dig = load_digits()
 
@@ -33,10 +34,10 @@ model.compile(optimizer=Adadelta(), loss='categorical_crossentropy', metrics=['c
 model.fit(x_train, y_train, epochs=50, batch_size=64, verbose=False)
 
 scores = model.evaluate(x_train, y_train)
-print("training set %s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+print("training set %s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
 
 scores = model.evaluate(x_val, y_val)
-print("test set %s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+print("test set %s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
 
 # preds = model.predict_classes(x_val)
 

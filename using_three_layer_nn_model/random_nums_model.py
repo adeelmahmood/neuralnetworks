@@ -1,12 +1,8 @@
-import numpy as np
 import sys
+
 sys.path.append(".")
 from utils.data_utils import *
 from utils.activation_functions import *
-import matplotlib
-import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
 from three_layer_nn.NeuralNetwork import NeuralNetwork
 
 n_features = 8
@@ -26,28 +22,29 @@ np.random.seed(seed)
 set = np.random.randn(n_samples, n_features)
 lbls = compute_labels(set, 1).reshape(n_samples, 1)
 
-training_set, training_labels, test_set, test_labels = split_train_test_dataset(set, lbls, split_by = "rows", perc = 0.1)
-
+training_set, training_labels, test_set, test_labels = split_train_test_dataset(set, lbls, split_by="rows", perc=0.1)
 
 for opt in ["gd", "momentum", "adam"]:
     print('\n:: gradient descent - optimizer = ' + opt)
     parameters, errors = nn.train(training_set, training_labels, n_hidden=n_hidden,
-        learning_rate = learning_rate, n_iterations=n_iterations,
-        activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
-        optimizer=opt)
+                                  learning_rate=learning_rate, n_iterations=n_iterations,
+                                  activation_functions=activation_functions,
+                                  activation_functions_dervs=activation_functions_dervs,
+                                  optimizer=opt)
     nn.predict(parameters, test_set, test_labels, activation_functions, lambda x: (x > 0.5).astype(int))
 
     print(':: gradient descent with regularization')
     parameters, errors = nn.train(training_set, training_labels, n_hidden=n_hidden,
-        learning_rate = learning_rate, n_iterations=n_iterations,
-        activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
-        optimizer=opt, lambd=0.1)
+                                  learning_rate=learning_rate, n_iterations=n_iterations,
+                                  activation_functions=activation_functions,
+                                  activation_functions_dervs=activation_functions_dervs,
+                                  optimizer=opt, lambd=0.1)
     nn.predict(parameters, test_set, test_labels, activation_functions, lambda x: (x > 0.5).astype(int))
 
     print(':: gradient descent with drop out')
     parameters, errors = nn.train(training_set, training_labels, n_hidden=n_hidden,
-        learning_rate = learning_rate, n_iterations=n_iterations,
-        activation_functions=activation_functions, activation_functions_dervs = activation_functions_dervs,
-        optimizer=opt, keep_prob=0.8)
+                                  learning_rate=learning_rate, n_iterations=n_iterations,
+                                  activation_functions=activation_functions,
+                                  activation_functions_dervs=activation_functions_dervs,
+                                  optimizer=opt, keep_prob=0.8)
     nn.predict(parameters, test_set, test_labels, activation_functions, lambda x: (x > 0.5).astype(int))
-
