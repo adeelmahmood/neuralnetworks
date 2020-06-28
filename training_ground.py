@@ -63,3 +63,7 @@ print(p)
 
 print(x[p, :])
 # print(y[p, :])
+
+print('000')
+a = np.arange(100).reshape(10, 10)
+print(a[:5,:])
