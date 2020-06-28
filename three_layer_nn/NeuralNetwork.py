@@ -230,24 +230,26 @@ class NeuralNetwork:
         return predictions
 
     def train(self,
-              X, Y, n_hidden, learning_rate, n_iterations,
+              X, Y, layers, learning_rate, n_iterations,
               activation_functions, activation_functions_dervs,
               keep_prob=1, lambd=0, optimizer="gd",
               beta=0.9, beta1=0.9, beta2=0.999, epsilon=1e-8,
-              printCost=False):
+              print_cost=False, print_cost_freq=1000):
 
         n_input = X.shape[1]
         n_output = Y.shape[1]
         t = 0
+        costs = []
 
-        parameters = self.initialize_weights_and_biases([n_input, n_hidden, n_hidden, n_output])
+        layers.insert(0, n_input)
+        layers.append(n_output)
+        parameters = self.initialize_weights_and_biases(layers)
 
         if (optimizer == "momentum"):
             v = self.initialize_momentum(parameters)
         elif (optimizer == "adam"):
             v, s = self.initialize_adam(parameters)
 
-        errors = []
         for i in range(n_iterations):
             if (keep_prob == 1):
                 activations = self.forward(parameters, X, activation_functions)
@@ -271,27 +273,32 @@ class NeuralNetwork:
                 parameters, v, s = self.update_parameters_with_adam(parameters, grads, v, s, t, learning_rate, beta1,
                                                                     beta2, epsilon)
 
-            if (printCost == True and i % 1000 == 0):
+            if (print_cost == True and i % print_cost_freq == 0):
                 if (lambd == 0):
-                    print("cost after {} iterations {}".format(i, str(self.cost(activations['A3'], Y))))
+                    cost = self.cost(activations['A3'], Y)
                 elif (lambd != 0):
-                    print("cost after {} iterations {}".format(i, str(
-                        self.cost_with_regularization(activations['A3'], Y, parameters, lambd))))
+                    cost = self.cost_with_regularization(activations['A3'], Y, parameters, lambd)
+                print("cost after {} iterations {}".format(i, str(cost)))
+                costs.append(cost)
 
-        return parameters, errors
+
+        return parameters, costs
 
     def train_in_batches(self,
-                         X, Y, n_hidden, learning_rate, n_iterations,
+                         X, Y, layers, learning_rate, n_iterations,
                          activation_functions, activation_functions_dervs,
                          keep_prob=1, lambd=0, optimizer="gd",
                          batch_size=64, beta=0.9, beta1=0.9, beta2=0.999, epsilon=1e-8,
-                         printCost=False):
-
+                         print_cost=False, print_cost_freq=100):
+        m = X.shape[0]
         n_input = X.shape[1]
         n_output = Y.shape[1]
         t = 0
+        costs = []
 
-        parameters = self.initialize_weights_and_biases([n_input, n_hidden, n_hidden, n_output])
+        layers.insert(0, n_input)
+        layers.append(n_output)
+        parameters = self.initialize_weights_and_biases(layers)
 
         if (optimizer == "momentum"):
             v = self.initialize_momentum(parameters)
@@ -299,9 +306,11 @@ class NeuralNetwork:
             v, s = self.initialize_adam(parameters)
 
         batchSeed = 0
+        n_batches = (m / batch_size)
 
-        errors = []
         for i in range(n_iterations):
+            iter_cost = 0
+
             for batch in generate_mini_batches(X, Y, batch_size, batchSeed):
 
                 (batchX, batchY) = batch
@@ -330,11 +339,12 @@ class NeuralNetwork:
                     parameters, v, s = self.update_parameters_with_adam(parameters, grads, v, s, t, learning_rate,
                                                                         beta1, beta2, epsilon)
 
-                if (printCost == True and i % 1000 == 0):
-                    if (lambd == 0):
-                        print("cost after {} iterations {}".format(i, str(self.cost(activations['A3'], batchY))))
-                    elif (lambd != 0):
-                        print("cost after {} iterations {}".format(i, str(
-                            self.cost_with_regularization(activations['A3'], batchY, parameters, lambd))))
+            if (print_cost == True and i % print_cost_freq == 0):
+                if (lambd == 0):
+                    iter_cost += self.cost(activations['A3'], batchY) / n_batches
+                elif (lambd != 0):
+                    iter_cost += self.cost_with_regularization(activations['A3'], batchY, parameters, lambd) / n_batches
+                costs.append(iter_cost)
+                print("cost after {} iterations {}".format(i, str(iter_cost)))
 
-        return parameters, errors
+        return parameters, costs

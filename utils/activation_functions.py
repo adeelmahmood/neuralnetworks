@@ -23,6 +23,10 @@ def tanh_derv(x):
     return (1 - np.power(x, 2))
 
 
-def softmax(s):
-    exps = np.exp(s - np.max(s, axis=1, keepdims=True))
-    return exps / np.sum(exps, axis=1, keepdims=True)
+def softmax(x):
+    x_exp = np.exp(x)
+    x_sum = np.sum(x_exp, axis=1, keepdims=True)
+    s = x_exp / x_sum
+    return s
+    # exps = np.exp(s - np.max(s, axis=1, keepdims=True))
+    # return exps / np.sum(exps, axis=1, keepdims=True)
