@@ -43,6 +43,7 @@ oauthlib==3.1.0
 opt-einsum==2.3.2
 pandas==0.24.2
 pathlib2==2.3.5
+Pillow==6.2.2
 protobuf==3.12.2
 py2app==0.7.3
 pyasn1==0.4.8
