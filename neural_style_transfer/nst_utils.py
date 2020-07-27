@@ -52,7 +52,7 @@ Here is the detailed configuration of the VGG model:
 """
 
 
-def load_vgg_model():
+def load_vgg_model(image_width, image_height):
     vgg = scipy.io.loadmat('/Users/adeelqureshi/Downloads/imagenet-vgg-verydeep-19.mat')
     print('vgg19 model loaded')
 
@@ -81,7 +81,7 @@ def load_vgg_model():
         return tf.nn.avg_pool2d(prev_layer, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
     graph = {}
-    graph['input'] = tf.Variable(np.zeros((1, 300, 400, 3)), dtype='float32')
+    graph['input'] = tf.Variable(np.zeros((1, image_height, image_width, 3)), dtype='float32')
     graph['conv1_1'] = _conv2d_relu(graph['input'], 0, 'conv1_1')
     graph['conv1_2'] = _conv2d_relu(graph['conv1_1'], 2, 'conv1_2')
     graph['avgpool1'] = _avgpool(graph['conv1_2'])
@@ -117,12 +117,12 @@ def reshape_and_normalize_image(image):
     return image
 
 
-def generate_noise_image(content_image):
+def generate_noise_image(content_image, image_width, image_height, noise_threshold = 0.6):
     # Generate a random noise_image
-    noise_image = np.random.uniform(-20, 20, (1, 300, 400, 3)).astype('float32')
+    noise_image = np.random.uniform(-20, 20, (1, image_height, image_width, 3)).astype('float32')
 
     # Set the input_image to be a weighted average of the content_image and a noise_image
-    input_image = noise_image * 0.6 + content_image * (1 - 0.6)
+    input_image = noise_image * noise_threshold + content_image * (1 - noise_threshold)
 
     return input_image
 

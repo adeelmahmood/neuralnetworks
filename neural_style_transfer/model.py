@@ -11,26 +11,36 @@ import imageio
 from PIL import Image
 import shutil
 
-images_dir = '/Users/adeelqureshi/neuralnetworks/neural_style_transfer/images/'
-content_img_path = '/Users/adeelqureshi/Downloads/content.jpg'
-style_img_path = '/Users/adeelqureshi/Downloads/style.jpg'
+"""
+Input Parameters - Start
+"""
 
-resize_content_image = True
-resize_style_image = True
+content_img_path = '/Users/adeelqureshi/Downloads/Photos/IMG_6230.jpg'
+style_img_path = '/Users/adeelqureshi/Downloads/picaso2-style.jpg'
+
+image_width = 400
+image_height = 300
+noise_threshold = 0.2
+
+"""
+Input Parameters - End
+"""
+
+images_dir = '/Users/adeelqureshi/neuralnetworks/neural_style_transfer/images/'
 
 shutil.rmtree(images_dir)
 os.mkdir(images_dir)
 
 content_image = Image.open(content_img_path)
-if resize_content_image:
-    new_content_image = content_image.resize((400, 300))
+if content_image.size[0] != image_width or content_image.size[1] != image_height:
+    new_content_image = content_image.resize((image_width, image_height))
     new_content_image.save(images_dir + 'content.jpg')
 else:
     content_image.save(images_dir + 'content.jpg')
 
 style_image = Image.open(style_img_path)
-if resize_style_image:
-    new_style_image = style_image.resize((400, 300))
+if style_image.size[0] != image_width or style_image.size[1] != image_height:
+    new_style_image = style_image.resize((image_width, image_height))
     new_style_image.save(images_dir + 'style.jpg')
 else:
     style_image.save(images_dir + 'style.jpg')
@@ -95,9 +105,9 @@ sess = tf.InteractiveSession()
 
 content_img = reshape_and_normalize_image(content_img)
 style_img = reshape_and_normalize_image(style_img)
-gen_image = generate_noise_image(content_img)
+gen_image = generate_noise_image(content_img, image_width, image_height, noise_threshold)
 
-model = load_vgg_model()
+model = load_vgg_model(image_width, image_height)
 
 # -- compute content cost from content image --
 sess.run(model['input'].assign(content_img))
@@ -145,10 +155,9 @@ def model_nn(sess, input_img, n_iterations=200):
         if i % 20 == 0:
             tc, cc, sc = sess.run([total_cost, content_cost, style_cost])
             print('Iteration %i\t\t| Content Cost = %f\t\t| Style Cost = %f\t\t| Total Cost = %f' % (i, cc, sc, tc))
-            save_image('/Users/adeelqureshi/neuralnetworks/neural_style_transfer/images/out-' + str(i) + '.png',
-                       generated_image)
+            # save_image(images_dir + 'out-' + str(i) + '.png', generated_image)
 
-    save_image('/Users/adeelqureshi/neuralnetworks/neural_style_transfer/images/final.png', generated_image)
+    save_image(images_dir + 'final.png', generated_image)
 
 
 model_nn(sess, gen_image)
